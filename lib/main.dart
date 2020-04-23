@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
@@ -8,10 +9,8 @@ import 'package:camera/camera.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-//import 'package:camera_app/camera_controls.dart';
-//import 'package:camera_app/permission.dart';
 import './files.dart';
-import './camera_controls.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 List<CameraDescription> cameras;
 
@@ -31,10 +30,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Auth Demo',
+      title: 'Secure Vault',
       theme: ThemeData(
-        primarySwatch: Colors.amber,
-      ),
+          brightness: Brightness.light,
+          primarySwatch: Colors.amber,
+          primaryColor: Colors.amber),
       home: MyHomePage(title: 'Secure Vault'),
     );
   }
@@ -84,19 +84,8 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  // CameraControls _cameraControls(BuildContext context) {
-  //   return CameraControls(
-  //     //toggleCameraMode: _toggleCameraMode,
-  //     takePicture: () => _capture(),
-  //     //switchCameras: _switchCamera,
-  //   );
-  // }
-
   void _capture() async {
-    // Take the Picture in a try / catch block. If anything goes wrong,
-    // catch the error.
     try {
-      // Ensure that the camera is initialized.
       await _initializeControllerFuture;
 
       final path = join(
@@ -106,15 +95,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
       await _controller.takePicture(path);
 
-      // attempt to save to gallery
       bool hasPermission =
           await PermissionsService().hasGalleryWritePermission();
-
-      // request for permision if not given
       if (!hasPermission) {
         bool isGranted =
             await PermissionsService().requestPermissionToGallery();
-
         if (!isGranted) {
           print('Not granted');
           return;
@@ -122,43 +107,12 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       var image = await File(path).readAsBytes();
-
       var y = Uint8List.fromList(image);
-
       await ImageGallerySaver.saveImage(y);
     } catch (e) {
       print(e);
     }
   }
-  // Future<void> _checkBiometric() async {
-  //   bool canCheckBiometric = false;
-  //   try {
-  //     canCheckBiometric = await _localAuthentication.canCheckBiometrics;
-  //   } on PlatformException catch (e) {
-  //     print(e);
-  //   }
-
-  //   if (!mounted) return;
-
-  //   setState(() {
-  //     _canCheckBiometric = canCheckBiometric;
-  //   });
-  // }
-
-  // Future<void> _getListOfBiometricTypes() async {
-  //   List<BiometricType> listofBiometrics;
-  //   try {
-  //     listofBiometrics = await _localAuthentication.getAvailableBiometrics();
-  //   } on PlatformException catch (e) {
-  //     print(e);
-  //   }
-
-  //   if (!mounted) return;
-
-  //   setState(() {
-  //     _availableBiometricTypes = listofBiometrics;
-  //   });
-  // }
 
   bool isAuthorized = false;
   Future<void> _authorizeNow() async {
@@ -166,8 +120,9 @@ class _MyHomePageState extends State<MyHomePage> {
       isAuthorized = await _localAuthentication.authenticateWithBiometrics(
         localizedReason: "Please authenticate to complete your transaction",
         useErrorDialogs: true,
-        stickyAuth: true,
+        stickyAuth: false,
       );
+      //return;
     } on PlatformException catch (e) {
       print(e);
     }
@@ -175,85 +130,118 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!mounted) return;
 
     setState(() {
-      if (atcount == 0) {
-        if (isAuthorized) {
-          _capture();
-          atcount = 0;
-          _authorizedOrNot = "Authorized";
-        }
-      }
-      if (atcount == 3) {
+      if (isAuthorized && atcount <= 2) {
+        print(atcount.toString() + ' Still trying');
+        //atcount = 0;
+        _authorizedOrNot = "Authorized";
+      } else if (atcount == 2 || atcount == 3) {
+        print('Should change string ' + atcount.toString());
+        _capture();
         _authorizedOrNot = ' 3 invalid attempts!\nAttempt logged!';
+        //atcount=0;
       } else {
+        print('Else case: ' + atcount.toString());
         atcount += 1;
         _authorizedOrNot = "Not Authorized";
       }
     });
   }
 
+  var montStyle = TextStyle(fontSize: 20, fontFamily: 'Montserrat');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+          style: montStyle,
+        ),
       ),
-      body: Center(
+      body: Container(
+        constraints: BoxConstraints.expand(),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+              image: NetworkImage(
+                  "https://media3.giphy.com/media/P6zj1j9OMinzW/source.gif"),
+              fit: BoxFit.cover),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           //direction: Axis.vertical,
           //mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Text("Can we check Biometric : $_canCheckBiometric"),
-            // RaisedButton(
-            //   onPressed: _checkBiometric,
-            //   child: Text("Check Biometric"),
-            //   color: Colors.red,
-            //   colorBrightness: Brightness.light,
-            // ),
-            // Text("List Of Biometric : ${_availableBiometricTypes.toString()}"),
-            // RaisedButton(
-            //   onPressed: _getListOfBiometricTypes,
-            //   child: Text("List of Biometric Types"),
-            //   color: Colors.red,
-            //   colorBrightness: Brightness.light,
-            // ),
-            //Icon(icon:),
+            Container(
+              child: isAuthorized
+                  ? Text('')
+                  : Text(
+                      'Please authenticate first',
+                      style: TextStyle(
+                          fontSize: 26,
+                          color: isAuthorized ? Colors.green[400] : Colors.red,
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.bold),
+                    ),
+            ),
             Text(
-              "Authorized : $_authorizedOrNot",
+              "$_authorizedOrNot",
               style: TextStyle(
-                fontSize: 20,
-                color: Colors.blueGrey,
-              ),
+                  fontSize: 26,
+                  color: isAuthorized ? Colors.green[400] : Colors.red,
+                  fontFamily: 'Montserrat',
+                  fontWeight: FontWeight.bold),
             ),
             Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [Color(0xAFFF4535), Color(0XFFFF7F2D)],
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.topRight),
+              ),
+              height: 100,
+              width: 100,
+              //color: Colors.lightBlue[100],
               margin: EdgeInsets.all(20),
               child: Icon(
                 Icons.fingerprint,
                 size: 50,
+                color: Colors.white,
               ),
             ),
             RaisedButton(
+              elevation: 20,
+              hoverElevation: 50,
+              //animationDuration: Duration(milliseconds: 2000),
               onPressed: _authorizeNow,
               child: Text(
-                "Authorize now",
-                style: TextStyle(fontSize: 18),
+                "Authenticate",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'Montserrat',
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              color: Colors.orange[700],
+              color: Colors.orange[400],
               colorBrightness: Brightness.light,
             ),
-            MaterialButton(
+            RaisedButton(
+              color: Colors.yellow,
               onPressed: isAuthorized
                   ? () {
+                      //Scaffold.of(context).showSnackBar(snackBar);
                       Navigator.push(
                         context,
                         new MaterialPageRoute(
-                          builder: (context) => Files(),
+                          builder: (context) => Files(atcount: atcount),
                         ),
                       );
                     }
                   : null,
               child: Text(
                 'Continue',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.bold),
               ),
             )
           ],

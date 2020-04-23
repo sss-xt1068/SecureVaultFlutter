@@ -25,6 +25,7 @@ dependencies:
   path:
   image_gallery_saver:
   permission_handler: ^3.2.2
+  cloud_firestore: ^0.12.11
   # camera_app:
 
 dev_dependencies:
@@ -37,9 +38,15 @@ module:
 
 # The following section is specific to Flutter.
 flutter:
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto-Regular.ttf
+        - asset: fonts/Roboto-Medium.ttf
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat-Medium.otf
+        - asset: fonts/Montserrat-Regular.otf
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   # assets:

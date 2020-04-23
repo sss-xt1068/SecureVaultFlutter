@@ -60,3 +60,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     api "androidx.core:core:1.1.0-alpha03"
 }
+apply plugin: 'com.google.gms.google-services'

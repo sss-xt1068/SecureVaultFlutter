@@ -1,198 +1,120 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterlocalauth/main.dart';
+import './firestore.dart';
+
+final List names = [
+  '.estrongs',
+  '.DataStorage',
+  'Android',
+  'AnyDesk',
+  'Bluetooth',
+  'cache',
+  'CamScanner',
+  'Documents',
+  'Downloads',
+  'Music',
+  'Paytm',
+  'SHAREit',
+  'WhatsApp',
+];
 
 class Files extends StatelessWidget {
-  final List names = [
-    '.estrongs',
-    '.DataStorage',
-    'Android',
-    'AnyDesk',
-    'Bluetooth',
-    'cache',
-    'CamScanner',
-    'Documents',
-    'Downloads',
-    'Music',
-    'Paytm',
-    'SHAREit',
-    'WhatsApp',
-  ];
-
+  int atcount;
+  Files({
+    @required this.atcount,
+    
+  });
+  var style1 = TextStyle(fontSize: 18, fontFamily: 'Montserrat');
+  var style2 = TextStyle(fontFamily: 'Montserrat');
   Widget build(BuildContext context) {
+    print('Atcount received is'+atcount.toString());
     return Scaffold(
       drawer: Drawer(
-        child: Column(children: [
-          DrawerHeader(
-            child: Text(
-              'MENU',
+        child: Column(
+          children: [
+            DrawerHeader(
+              child: Text(
+                'MENU',
+                style: style1,
+              ),
             ),
-          ),
-          ListTile(
+            ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    new MaterialPageRoute(
+                      builder: (context) => new Database(atcount:atcount),
+                    ),
+                  );
+                },
+                title: Text(
+                  'Unauthorized Attempts',
+                  style: style1,
+                ),
+                subtitle: Text(
+                  'All unauthorized log-in attempts',
+                  style: style2,
+                )),
+            ListTile(
               title: Text(
-                'Unauthorized Attempts',
-                style: TextStyle(fontSize: 18),
+                'Your Files',
+                style: style1,
               ),
               subtitle: Text(
-                'All unauthorized log-in attempts',
-              )),
-          ListTile(
-            title: Text(
-              'Your Files',
-              style: TextStyle(fontSize: 18),
-            ),
-            subtitle: Text('All you files easily accessible'),
-          )
-        ]),
-      ),
-      appBar: AppBar(
-        title: Text('Your files'),
-      ),
-      body: Center(
-        child: ListView(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[0],
-                  style: TextStyle(fontSize: 22),
-                ),
+                'All your files easily accessible',
+                style: style2,
               ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[1],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-                padding: EdgeInsets.all(20),
-                height: 100,
-                child: Center(
-                  child: Text(
-                    names[2],
-                    style: TextStyle(fontSize: 22),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                    builder: (context) => new Files(atcount: atcount,),
                   ),
-                ),
-                color: Colors.orange[200]),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[3],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[4],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[5],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[6],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[7],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[8],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[9],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[10],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[11],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              height: 100,
-              child: Center(
-                child: Text(
-                  names[12],
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-              color: Colors.orange[200],
-            ),
+                );
+              },
+            )
           ],
         ),
+      ),
+      appBar: AppBar(
+        title: Text(
+          'Your files',
+          style: TextStyle(
+            fontFamily: 'Montserrat',
+            fontSize: 20,
+          ),
+        ),
+      ),
+      body: Center(
+        child: MyFiles(),
+      ),
+    );
+  }
+}
+
+class MyFiles extends StatelessWidget {
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.only(
+        top: 5,
+      ),
+      itemCount: names.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Container(
+          height: 50,
+          color: Colors.orange[200],
+          child: Center(
+            child: Text(
+              '${names[index]}',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+        );
+      },
+      separatorBuilder: (BuildContext context, int index) => const Divider(
+        color: Colors.blue,
+        thickness: 2,
       ),
     );
   }
