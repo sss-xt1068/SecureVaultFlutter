@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'dart:io';
 import 'dart:ui';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
@@ -101,6 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
         bool isGranted =
             await PermissionsService().requestPermissionToGallery();
         if (!isGranted) {
+          //showSnackBar(snackbar);
           print('Not granted');
           return;
         }
@@ -138,6 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
         print('Should change string ' + atcount.toString());
         _capture();
         _authorizedOrNot = ' 3 invalid attempts!\nAttempt logged!';
+        addlog();
         //atcount=0;
       } else {
         print('Else case: ' + atcount.toString());
@@ -145,6 +148,23 @@ class _MyHomePageState extends State<MyHomePage> {
         _authorizedOrNot = "Not Authorized";
       }
     });
+
+    
+  }
+
+  addlog() async{
+    final dbReference = Firestore.instance;
+    //var stream = Firestore.instance.collection('datetimelogs').snapshots();
+    var formatted = new DateFormat.yMd().add_jm().format(new DateTime.now());
+    await dbReference.collection('datetimelogs').document().setData(
+      {
+        'index': 0,
+        'when':formatted.toString(),
+      }
+    );
+    // Firestore.instance.runTransaction((transaction) async{
+    //   DocumentSnapshot snap = await transaction.get(Firestore.instance.collection('datetimelogs').document())
+    // });
   }
 
   var montStyle = TextStyle(fontSize: 20, fontFamily: 'Montserrat');

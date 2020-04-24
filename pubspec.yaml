@@ -26,17 +26,27 @@ dependencies:
   image_gallery_saver:
   permission_handler: ^3.2.2
   cloud_firestore: ^0.12.11
+  url_launcher:
   # camera_app:
 
 dev_dependencies:
+  
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.7.3"
 module:
   androidx: true
+
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
 # The following section is specific to Flutter.
+flutter_icons:
+
+  android: true
+  image_path: "assets/icon.jpg"
+  #//koi bhi ek image download kar...jo logo rakhna ho
+
 flutter:
   fonts:
     - family: Roboto
