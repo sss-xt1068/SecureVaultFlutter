@@ -1,6 +1,6 @@
-# flutterlocalauth
+# SecureVault Flutter
 
-A new Flutter project.
+A Secure file explorer built in Flutter. Uses fingerprint authentication using the [local_auth](https://pub.dev/packages/local_auth) package in Flutter. Implements security features to capture secret photo from the front camera if 3 invalid attempts recorded using the [camera plugin](https://pub.dev/packages/camera) for flutter.
 
 ## Getting Started
 
