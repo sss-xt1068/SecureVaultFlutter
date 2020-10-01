@@ -1,6 +1,10 @@
+import 'dart:io' as io;
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import './firestore.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:downloads_path_provider/downloads_path_provider.dart';
 
 final List names = [
   '.estrongs',
@@ -19,66 +23,17 @@ final List names = [
 ];
 
 class Files extends StatelessWidget {
-  int atcount;
-  Files({
-    @required this.atcount,
-  });
+  final int atcount;
+  //default constructor for maintaining count variable
+
+  Files({@required this.atcount});
   var style1 = TextStyle(fontSize: 18, fontFamily: 'Montserrat');
   var style2 = TextStyle(fontFamily: 'Montserrat');
+  var style3 =
+      TextStyle(fontSize: 24, color: Colors.white, fontFamily: 'Montserrat');
   Widget build(BuildContext context) {
     print('Atcount received is' + atcount.toString());
     return Scaffold(
-      drawer: Drawer(
-        child: Column(
-          children: [
-            DrawerHeader(
-              curve: Curves.bounceInOut,
-              //duration: Duration(milliseconds: 2000),
-              child: Text(
-                'MENU',
-                style: style1,
-              ),
-            ),
-            ListTile(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    new MaterialPageRoute(
-                      builder: (context) => new Database(atcount: atcount),
-                    ),
-                  );
-                },
-                title: Text(
-                  'Unauthorized Attempts',
-                  style: style1,
-                ),
-                subtitle: Text(
-                  'All unauthorized log-in attempts',
-                  style: style2,
-                )),
-            ListTile(
-              title: Text(
-                'Your Files',
-                style: style1,
-              ),
-              subtitle: Text(
-                'All your files easily accessible',
-                style: style2,
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  new MaterialPageRoute(
-                    builder: (context) => new Files(
-                      atcount: atcount,
-                    ),
-                  ),
-                );
-              },
-            )
-          ],
-        ),
-      ),
       appBar: AppBar(
         title: Text(
           'Your files',
@@ -89,22 +44,79 @@ class Files extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: MyFiles(),
+        child: Wrap(
+          runSpacing: 20,
+          alignment: WrapAlignment.center,
+          direction: Axis.horizontal,
+          //mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            MaterialButton(
+              height: 60,
+              color: Colors.orangeAccent,
+              child: Text(
+                'Unauthorized Attempts',
+                style: style3,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                    builder: (context) => new Database(atcount: atcount),
+                  ),
+                );
+              },
+            ),
+            MaterialButton(
+              height: 60,
+              color: Colors.orangeAccent,
+              child: Text(
+                'Your Files',
+                style: style3,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                    builder: (context) => MyFiles(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        //child: MyFiles(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _launchURL,
-        child: Icon(Icons.open_in_browser),
+        child: ClipOval(
+          child: Image.asset(
+            'assets/github.png',
+            colorBlendMode: BlendMode.overlay,
+            fit: BoxFit.fill,
+          ),
+        ),
       ),
       bottomSheet: Container(
-          height: 12,
-          width: double.infinity,
-          alignment: Alignment.center,
-          child: Text('Made with love in Flutter')),
+        height: 13,
+        width: double.infinity,
+        alignment: Alignment.center,
+        child: Row(children: [
+          Text(
+            'Made with ',
+            style: TextStyle(fontFamily: 'Montserrat'),
+          ),
+          Image.asset('assets/heart.png', height: 40),
+          Text(
+            ' using Flutter',
+            style: TextStyle(fontFamily: 'Montserrat'),
+          ),
+        ]),
+      ),
     );
   }
 
   _launchURL() async {
-    const url = 'https://www.github.com/sss-xt1068/';
+    const url = 'https://github.com/sss-xt1068/SecureVaultFlutter';
     try {
       if (await canLaunch(url)) {
         await launch(url);
@@ -117,46 +129,95 @@ class Files extends StatelessWidget {
   }
 }
 
-class MyFiles extends StatelessWidget {
+class MyFiles extends StatefulWidget {
+  @override
+  _MyFilesState createState() => _MyFilesState();
+}
+
+String actualDir;
+List filevar = List();
+io.Directory _downloadsDirectory;
+
+class _MyFilesState extends State<MyFiles> {
+// class MyFiles extends StatelessWidget {
+  var style2 = TextStyle(fontFamily: 'Montserrat');
+  var style1 = TextStyle(fontSize: 18, fontFamily: 'Montserrat');
+  void initState() {
+    super.initState();
+    // initDownloadsDirectoryState();
+  }
+
+  // void initDownloadsDirectoryState() {
+  // getDir();
+  // }
+
+  // getDir() async {
+  //   try {
+  //     io.Directory _downloadsDirectory =
+  //         await DownloadsPathProvider.downloadsDirectory;
+  //   } catch (PlatformException) {
+  //     print('Couldn\'t find downloads :(');
+  //     io.Directory _downloadsDirectory =
+  //         await getApplicationDocumentsDirectory();
+  //   }
+  //   if (!mounted) return;
+
+  //   String myPath = _downloadsDirectory.path;
+  //   setState(() {
+  //     actualDir = myPath;
+  //     print(actualDir);
+  //     filevar = io.Directory("$actualDir/").listSync(recursive: false);
+  //     print(filevar[0].path);
+  //   });
+  // }
+
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.only(
-        top: 5,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Your files', style: style2),
       ),
-      itemCount: names.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Row(
-          children: [
-            Icon(Icons.folder, size: 35),
-            //tera symbol
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.only(left: 10, right: 10, top: 2, bottom: 2),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Colors.deepOrange[200]),
-                height: 50,
-                //color: Colors.orange[200],
-                child: Center(
-                  child: Text(
-                    '${names[index]}',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.w300),
+      body: ListView.builder(
+        itemCount: names.length,
+        itemBuilder: (context, index) {
+          return Container(
+            margin: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.blue[100],
+                    Colors.cyan[100],
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey,
+                    blurRadius: 4,
+                    spreadRadius: 2,
+                    offset: Offset(2, 4),
                   ),
+                ]),
+            child: ListTile(
+              title: Text(
+                names[index].toString(),
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: names[index].toString().startsWith('.')
+                      ? Colors.grey[500]
+                      : Colors.black,
+                  fontSize: 16,
                 ),
               ),
+              leading: Icon(
+                Icons.folder,
+                color: names[index].toString().startsWith('.')
+                    ? Colors.grey[500]
+                    : Colors.black54,
+              ),
+              trailing: Icon(Icons.arrow_right),
             ),
-            //Align(alignment: Alignment.topRight, child: Icon(Icons.arrow_right)),
-            Icon(Icons.arrow_right, size: 40)
-            //tera second symbol..
-          ],
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) => const Divider(
-        color: Colors.red,
-        thickness: 2,
+          );
+        },
       ),
     );
   }
